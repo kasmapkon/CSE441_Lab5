@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+// AddScreen.tsx
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { connect } from 'react-redux';
 import axios from 'axios';
 
-const AddScreen = () => {
+const AddScreen = ({ authToken }) => {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
+
+  useEffect(() => {
+    console.log('AuthToken in AddScreen:', authToken);
+  }, [authToken]);
 
   const handleAddService = async () => {
     try {
@@ -13,7 +19,11 @@ const AddScreen = () => {
         price: price,
       };
 
-      const response = await axios.post('https://kami-backend-5rs0.onrender.com/services', newService);
+      const response = await axios.post('https://kami-backend-5rs0.onrender.com/services', newService, {
+        headers: {
+          Authorization: `Bearer ${authToken}`, 
+        },
+      });
 
       console.log('Response:', response.data);
 
@@ -45,6 +55,12 @@ const AddScreen = () => {
   );
 };
 
+const mapStateToProps = state => {
+  return {
+    authToken: state.auth.authToken,
+  };
+};
+
 const styles = StyleSheet.create({
   container: {
     padding: 16,
@@ -62,4 +78,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddScreen;
+export default connect(mapStateToProps)(AddScreen);
